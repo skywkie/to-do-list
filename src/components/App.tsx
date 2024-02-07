@@ -14,10 +14,10 @@ const App = () => {
    const titleRef = useRef<any>();
    const infoRef = useRef<any>();
 
-   function saveTask(tasks: any) {
+   function saveTasks(tasks: any) {
       localStorage.setItem("tasks", JSON.stringify(tasks));
    }
-   const createTask = () => {
+   function createTask() {
       setTasks([
          ...tasks,
          {
@@ -26,14 +26,23 @@ const App = () => {
          },
       ]);
 
-      saveTask([
+      saveTasks([
          ...tasks,
          {
             title: titleRef.current.value,
             info: infoRef.current.value,
          },
       ]);
-   };
+   }
+   function deleteTask(index: number) {
+      const clonedTasks = [...tasks];
+
+      clonedTasks.splice(index, 1);
+
+      setTasks(clonedTasks);
+
+      saveTasks([...clonedTasks]);
+   }
    function loadTasks() {
       let loadedTasks: any = localStorage.getItem("tasks");
 
@@ -84,12 +93,12 @@ const App = () => {
                                     ? `Title: ${task.title}`
                                     : "Title was not found."}
                               </h4>
-                              <h4>
+                              <p>
                                  {task.info
                                     ? `Info: ${task.info}`
                                     : "No summary was provided for this task."}
-                              </h4>
-                              <button>delete</button>
+                              </p>
+                              <button onClick={() => deleteTask(i)}>Delete Task</button>
                            </div>
                         );
                      })
