@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext, useMemo } from "react";
+import { ThemeContext } from "./src/context";
 import "./App.css";
 
 type tasksType = {
@@ -14,7 +15,16 @@ const App = () => {
    const titleRef = useRef<any>();
    const infoRef = useRef<any>();
 
-   function saveTasks(tasks: any) {
+   const [theme, setTheme] = useState<string>("light");
+   const ctxValue = useMemo(
+      () => ({
+         theme,
+         setTheme,
+      }),
+      [theme]
+   );
+
+   function saveTasks(tasks: tasksType[]) {
       localStorage.setItem("tasks", JSON.stringify(tasks));
    }
    function createTask() {
@@ -58,11 +68,12 @@ const App = () => {
    }, []);
 
    return (
-      <div id="app">
+      <ThemeContext.Provider value={ctxValue}>
          {opened ? (
-            <div id="to-do-modal" className="align-center">
+            <div id="to-do-modal" className={"align-center " + theme}>
                <div className="container">
                   <h1 className="title">Menu</h1>
+                  <ThemeChanger />
                   <input
                      placeholder="title"
                      ref={titleRef}
@@ -81,9 +92,10 @@ const App = () => {
                </div>
             </div>
          ) : (
-            <div id="to-do-list" className="align-center">
+            <div id="to-do-list" className={"align-center " + theme}>
                <div className="container">
                   <h1 className="title">List</h1>
+                  <ThemeChanger />
                   {tasks.length > 0 ? (
                      tasks.map((task, i: number) => {
                         return (
@@ -115,7 +127,22 @@ const App = () => {
                </div>
             </div>
          )}
-      </div>
+      </ThemeContext.Provider>
+   );
+};
+
+const ThemeChanger = () => {
+   const { theme, setTheme } = useContext(ThemeContext);
+
+   return (
+      <input
+         className="theme-button"
+         type="checkbox"
+         checked={theme === "dark"}
+         onChange={(e) => {
+            setTheme(e.target.checked ? "dark" : "light");
+         }}
+      />
    );
 };
 
